@@ -1,0 +1,54 @@
+{
+  "name": "10-two-calls-straddling-revocation",
+  "description": "Earlier allowed call succeeds; subsequent call fails.",
+  "grants": [
+    {
+      "id": "root",
+      "principal": "agent",
+      "resource": "doc:42",
+      "actions": [
+        "read"
+      ],
+      "expires_at": 50
+    }
+  ],
+  "steps": [
+    {
+      "at": 1,
+      "op": "plan",
+      "call_id": "first",
+      "cap_id": "root",
+      "principal": "agent",
+      "action": "read",
+      "resource": "doc:42"
+    },
+    {
+      "at": 2,
+      "op": "dispatch",
+      "call_id": "first"
+    },
+    {
+      "at": 3,
+      "op": "plan",
+      "call_id": "second",
+      "cap_id": "root",
+      "principal": "agent",
+      "action": "read",
+      "resource": "doc:42"
+    },
+    {
+      "at": 4,
+      "op": "revoke",
+      "cap_id": "root"
+    },
+    {
+      "at": 5,
+      "op": "dispatch",
+      "call_id": "second"
+    }
+  ],
+  "expected": {
+    "first": true,
+    "second": false
+  }
+}

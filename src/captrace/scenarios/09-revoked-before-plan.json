@@ -1,0 +1,39 @@
+{
+  "name": "09-revoked-before-plan",
+  "description": "Revocation before planning is denied under both policies.",
+  "grants": [
+    {
+      "id": "root",
+      "principal": "agent",
+      "resource": "doc:42",
+      "actions": [
+        "read"
+      ],
+      "expires_at": 50
+    }
+  ],
+  "steps": [
+    {
+      "at": 1,
+      "op": "revoke",
+      "cap_id": "root"
+    },
+    {
+      "at": 2,
+      "op": "plan",
+      "call_id": "call1",
+      "cap_id": "root",
+      "principal": "agent",
+      "action": "read",
+      "resource": "doc:42"
+    },
+    {
+      "at": 3,
+      "op": "dispatch",
+      "call_id": "call1"
+    }
+  ],
+  "expected": {
+    "call1": false
+  }
+}

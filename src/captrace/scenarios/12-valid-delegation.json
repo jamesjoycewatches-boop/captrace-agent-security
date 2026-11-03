@@ -1,0 +1,44 @@
+{
+  "name": "12-valid-delegation",
+  "description": "Bounded delegated permission remains usable before expiry.",
+  "grants": [
+    {
+      "id": "root",
+      "principal": "agent",
+      "resource": "doc:42",
+      "actions": [
+        "read"
+      ],
+      "expires_at": 50
+    },
+    {
+      "id": "child",
+      "principal": "worker",
+      "resource": "doc:42",
+      "actions": [
+        "read"
+      ],
+      "expires_at": 30,
+      "parent_id": "root"
+    }
+  ],
+  "steps": [
+    {
+      "at": 2,
+      "op": "plan",
+      "call_id": "call1",
+      "cap_id": "child",
+      "principal": "worker",
+      "action": "read",
+      "resource": "doc:42"
+    },
+    {
+      "at": 3,
+      "op": "dispatch",
+      "call_id": "call1"
+    }
+  ],
+  "expected": {
+    "call1": true
+  }
+}

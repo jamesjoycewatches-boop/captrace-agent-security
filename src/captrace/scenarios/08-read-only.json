@@ -1,0 +1,34 @@
+{
+  "name": "08-read-only",
+  "description": "Read authority must not permit write access.",
+  "grants": [
+    {
+      "id": "root",
+      "principal": "agent",
+      "resource": "doc:42",
+      "actions": [
+        "read"
+      ],
+      "expires_at": 50
+    }
+  ],
+  "steps": [
+    {
+      "at": 2,
+      "op": "plan",
+      "call_id": "call1",
+      "cap_id": "root",
+      "principal": "agent",
+      "action": "write",
+      "resource": "doc:42"
+    },
+    {
+      "at": 3,
+      "op": "dispatch",
+      "call_id": "call1"
+    }
+  ],
+  "expected": {
+    "call1": false
+  }
+}

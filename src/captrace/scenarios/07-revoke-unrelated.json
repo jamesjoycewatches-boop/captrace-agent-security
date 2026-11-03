@@ -1,0 +1,48 @@
+{
+  "name": "07-revoke-unrelated",
+  "description": "Revoking unrelated authority must not block a valid call.",
+  "grants": [
+    {
+      "id": "root",
+      "principal": "agent",
+      "resource": "doc:42",
+      "actions": [
+        "read"
+      ],
+      "expires_at": 50
+    },
+    {
+      "id": "other",
+      "principal": "other",
+      "resource": "doc:88",
+      "actions": [
+        "read"
+      ],
+      "expires_at": 50
+    }
+  ],
+  "steps": [
+    {
+      "at": 2,
+      "op": "plan",
+      "call_id": "call1",
+      "cap_id": "root",
+      "principal": "agent",
+      "action": "read",
+      "resource": "doc:42"
+    },
+    {
+      "at": 3,
+      "op": "revoke",
+      "cap_id": "other"
+    },
+    {
+      "at": 4,
+      "op": "dispatch",
+      "call_id": "call1"
+    }
+  ],
+  "expected": {
+    "call1": true
+  }
+}
