@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .core import Decision, Engine
+from .audit import seal
 
 
 @dataclass
@@ -20,11 +21,14 @@ class CaseResult:
     timeline: list[dict[str, Any]]
     effects: list[dict[str, Any]]
 
-    def as_dict(self) -> dict[str, Any]:
-        return {"name": self.name, "description": self.description,
+    def as_dict(self, *, include_audit: bool = False) -> dict[str, Any]:
+        result = {"name": self.name, "description": self.description,
                 "policy": self.policy, "passed": self.passed,
                 "expected": self.expected, "observed": self.observed,
                 "timeline": self.timeline, "effects": self.effects}
+        if include_audit:
+            result["audit"] = seal(self.timeline)
+        return result
 
 
 def load_scenario(path: str | Path) -> dict[str, Any]:

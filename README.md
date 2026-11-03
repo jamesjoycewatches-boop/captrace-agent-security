@@ -6,7 +6,7 @@
 
 When an AI agent plans an action while authorized, what happens if access is revoked *before the tool actually runs*? CapTrace makes this timing gap visible using reproducible authorization traces and an effect ledger.
 
-> **Status:** v0.1.0 experimental developer tool. This is **not** a production authorization service, a live AI integration, or a claim of novel research.
+> **Status:** v0.2.0 experimental developer tool. This is **not** a production authorization service, a live AI integration, or a claim of novel research.
 
 ## Features
 
@@ -15,7 +15,8 @@ When an AI agent plans an action while authorized, what happens if access is rev
 - **Scoped capabilities:** bind to a principal, resource, action and expiration.
 - **Delegation:** child grants cannot broaden permissions or outlive parents; ancestor revocation invalidates descendant grants.
 - **Offline reports:** text, JSON and Markdown formats, detailed event traces, and simulated effects.
-- **12 reproducible security scenarios** and **11 automated tests**.
+- **12 reproducible security scenarios**, **22 automated tests**, and exhaustive bounded race exploration.
+- **Hash-linked audit traces** with independently verifiable SHA-256 digest heads.
 - **Standard-library simulation core** and GitHub Actions CI for Python 3.10–3.13.
 
 ## Quick start
@@ -40,6 +41,38 @@ captrace --policy cached
 ```
 
 Five scenarios fail *by design*, demonstrating that stale authorization decisions may allow access after revocation or expiry. The CLI returns a nonzero exit code for mismatches.
+
+## New in v0.2: bounded race explorer
+
+Enumerate **every legal ordering** of one revocation and up to four independently
+planned and dispatched calls. The explorer derives the expected outcome from
+revocation state *at dispatch*, then replays each schedule with the selected
+policy. It emits concrete, JSON-replayable counterexamples for violations.
+
+```bash
+captrace --explore --calls 3 --policy runtime
+# 630 schedules, 0 authorization violations
+
+captrace --explore --calls 2 --policy cached --format json > witnesses.json
+# 30 schedules, 16 unsafe mismatches (intentional demonstration)
+```
+
+The number of explored schedules increases quickly (four calls: 22,680).
+This is **bounded, deterministic model exploration**, not a proof that a
+production agent or external tool service is safe.
+
+## New in v0.2: integrity-verifiable audit traces
+
+```bash
+captrace --policy runtime --format json --audit > report.json
+```
+
+The JSON report includes ordered events with per-entry SHA-256 hashes and a
+final digest (`head`). Save the head **independently** of the report, then
+verify against it via `captrace.audit.verify(ledger, trusted_head=...)`.
+Without trusted storage for that head, an attacker can replace both a modified
+log and its digest. Hash chaining is not a signature and cannot guarantee
+origin or completeness by itself.
 
 ## Example timeline
 
@@ -117,7 +150,7 @@ captrace --policy runtime
 ## Roadmap
 
 - Idempotency and retry/resume simulation.
-- Property-based and randomized deterministic traces.
+- Seeded randomized exploration and additional concurrent/in-flight action models.
 - Mock integration adapters for popular agent tool frameworks.
 - JUnit and SARIF export for CI security dashboards.
 
