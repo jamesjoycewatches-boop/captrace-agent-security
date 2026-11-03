@@ -1,3 +1,5 @@
+![CapTrace v0.2 — AI Agent Security Lab infographic by Umer Hassan](assets/captrace-v0.2-banner.png)
+
 # CapTrace
 
 **A deterministic, offline regression lab for AI agent tool permissions.**
