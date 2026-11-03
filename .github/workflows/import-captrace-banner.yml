@@ -30,7 +30,7 @@ jobs:
           python - <<'PY'
           import hashlib, pathlib, struct
           image = pathlib.Path("assets/captrace-v0.2-banner.png").read_bytes()
-          assert image[:8] == b'\\x89PNG\\r\\n\\x1a\\n', "Expected PNG"
+          assert image[:8] == bytes.fromhex("89504e470d0a1a0a"), "Expected PNG"
           assert struct.unpack(">II", image[16:24]) == (1672, 941), "Unexpected dimensions"
           assert 100_000 < len(image) < 5_000_000, "Unexpected file size"
           print("Validated CDN-delivered PNG; bytes:", len(image))
